@@ -1,0 +1,27 @@
+# permissions for end users to edit containerinjectors.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: apple-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: containerinjector-editor-role
+rules:
+- apiGroups:
+  - apple.nishant.ingle
+  resources:
+  - containerinjectors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apple.nishant.ingle
+  resources:
+  - containerinjectors/status
+  verbs:
+  - get

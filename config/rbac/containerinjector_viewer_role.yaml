@@ -1,0 +1,23 @@
+# permissions for end users to view containerinjectors.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: apple-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: containerinjector-viewer-role
+rules:
+- apiGroups:
+  - apple.nishant.ingle
+  resources:
+  - containerinjectors
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apple.nishant.ingle
+  resources:
+  - containerinjectors/status
+  verbs:
+  - get

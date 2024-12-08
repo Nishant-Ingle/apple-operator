@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- apple_v1_containerinjector.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

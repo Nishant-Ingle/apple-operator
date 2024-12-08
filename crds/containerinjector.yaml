@@ -1,0 +1,10 @@
+apiVersion: apple.nishant.ingle/v1
+kind: ContainerInjector
+metadata:
+  labels:
+    app.kubernetes.io/name: apple-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: containerinjector-sample
+spec:
+  image: "busybox"
+  label: "injector:help"
