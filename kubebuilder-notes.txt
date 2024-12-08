@@ -1,0 +1,42 @@
+1. Clone the repo
+
+2. Init Kubebuilder
+  kubebuilder init --domain nishant.ingle --repo github.com/Nishant-Ingle/apple-operator
+
+
+3. Define a custom resource
+  kubebuilder create api --group apple --version v1 --kind ContainerInjector
+
+4. Every struct should have json tags at all levels
+
+5. Run make build
+
+6. Complete the Reconcile method 
+
+7. Run make build
+
+8. Run: make run
+
+   There is no CRD and apple.dev group so this should fail
+
+9. Run: make install
+
+   This installs the operator in k8s cluster
+
+10. Now make run should work
+
+11. Create CR using config/samples/example.yaml with image busybox
+
+12. Apply the manifest, nothing gets logged as there is no deployment yet.
+
+13. Create nginx deployment and install it
+
+    We see 4 logs, deployment got updated 4 times e.g. status updates
+
+    Updating own resource makes reconcile again -> infinite loop
+
+14. What label are we looking for ?
+    Add a label to spec.
+    Add label: "injector:help" to CR spec.
+    Add label: injector: help to nginx deploy
+
