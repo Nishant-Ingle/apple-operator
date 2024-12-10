@@ -45,6 +45,8 @@ spec:
                 type: string
               image:
                 type: string
+              label:
+                type: string
             type: object
           status:
             description: ContainerInjectorStatus defines the observed state of ContainerInjector

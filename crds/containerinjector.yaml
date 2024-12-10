@@ -7,4 +7,4 @@ metadata:
   name: containerinjector-sample
 spec:
   image: "busybox"
-  label: "injector:help"
+  label: "help"

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    injector: help
+    app: nginx-injected
+  name: nginx-injected
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-injected
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx-injected
+    spec:
+      containers:
+      - image: nginx
+        name: nginx-injected
+        resources: {}
+status: {}

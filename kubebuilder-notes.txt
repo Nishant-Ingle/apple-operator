@@ -40,3 +40,4 @@
     Add label: "injector:help" to CR spec.
     Add label: injector: help to nginx deploy
 
+15. Create clean nginx manifest

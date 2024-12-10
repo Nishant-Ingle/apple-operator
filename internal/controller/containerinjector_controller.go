@@ -18,7 +18,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	applev1 "github.com/Nishant-Ingle/apple-operator/api/v1"
 	apps "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -60,11 +59,20 @@ func (r *ContainerInjectorReconciler) Reconcile(ctx context.Context, req ctrl.Re
 	deployments := &apps.DeploymentList{}
 	err = r.Client.List(ctx, deployments, &client.ListOptions{Namespace: req.NamespacedName.Namespace})
 
+	var deploys []apps.Deployment
+	//fmt.Println("cr injector:", injector.Spec.Label)
 	for _, v := range deployments.Items {
-		fmt.Println(v.Name)
-		fmt.Println("Labels: ", v.ObjectMeta.Labels)
+		//fmt.Println(v.Name)
+		//fmt.Println("obj injector:", v.ObjectMeta.Labels["injector"])
+
+		if v.ObjectMeta.Labels["injector"] == injector.Spec.Label {
+			deploys = append(deploys, v)
+		}
 	}
-	// TODO(user): your logic here
+	println("Deployments to update: ")
+	for _, deploy := range deploys {
+		println(deploy.Name)
+	}
 
 	return ctrl.Result{}, nil
 }
