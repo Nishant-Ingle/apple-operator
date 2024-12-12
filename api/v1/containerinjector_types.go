@@ -29,9 +29,11 @@ type ContainerInjectorSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of ContainerInjector. Edit containerinjector_types.go to remove/update
-	Foo   string `json:"foo,omitempty"`
-	Image string `json:"image,omitempty"`
-	Label string `json:"label,omitempty"`
+	Foo     string   `json:"foo,omitempty"`
+	Image   string   `json:"image,omitempty"`
+	Label   string   `json:"label,omitempty"`
+	Command []string `json:"command,omitempty" protobuf:"bytes,3,rep,name=command"`
+	Args    []string `json:"args,omitempty" protobuf:"bytes,4,rep,name=args"`
 }
 
 // ContainerInjectorStatus defines the observed state of ContainerInjector

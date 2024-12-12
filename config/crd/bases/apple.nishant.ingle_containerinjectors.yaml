@@ -39,6 +39,14 @@ spec:
           spec:
             description: ContainerInjectorSpec defines the desired state of ContainerInjector
             properties:
+              args:
+                items:
+                  type: string
+                type: array
+              command:
+                items:
+                  type: string
+                type: array
               foo:
                 description: Foo is an example field of ContainerInjector. Edit containerinjector_types.go
                   to remove/update

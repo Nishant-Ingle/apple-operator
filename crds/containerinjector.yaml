@@ -8,3 +8,5 @@ metadata:
 spec:
   image: "busybox"
   label: "help"
+  command: ["sleep"]
+  args: ["5000"]
