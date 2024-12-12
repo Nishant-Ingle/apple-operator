@@ -41,3 +41,7 @@
     Add label: injector: help to nginx deploy
 
 15. Create clean nginx manifest
+
+16. Add busybox container dynamically
+
+17. Finalizer restores state before CR was present, here busybox container would be gone.

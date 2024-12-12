@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -61,6 +62,42 @@ func (r *ContainerInjectorReconciler) Reconcile(ctx context.Context, req ctrl.Re
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
+	// name of our custom finalizer
+	myFinalizerName := "batch.tutorial.nishant.io/finalizer"
+
+	// examine DeletionTimestamp to determine if object is under deletion
+	if injector.ObjectMeta.DeletionTimestamp.IsZero() {
+		// The object is not being deleted, so if it does not have our finalizer,
+		// then lets add the finalizer and update the object. This is equivalent
+		// to registering our finalizer.
+		if !controllerutil.ContainsFinalizer(injector, myFinalizerName) {
+			controllerutil.AddFinalizer(injector, myFinalizerName)
+			if err := r.Update(ctx, injector); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	} else {
+		// The object is being deleted
+		if controllerutil.ContainsFinalizer(injector, myFinalizerName) {
+			// our finalizer is present, so lets handle any external dependency
+			if err := r.deleteExternalResources(ctx, req.NamespacedName.Namespace); err != nil {
+				// if fail to delete the external dependency here, return with error
+				// so that it can be retried.
+				return ctrl.Result{}, err
+			}
+
+			// remove our finalizer from the list and update it.
+			controllerutil.RemoveFinalizer(injector, myFinalizerName)
+			if err := r.Update(ctx, injector); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+		// Stop reconciliation as the item is being deleted
+		return ctrl.Result{}, nil
+	}
+
 	deployments := &appsv1.DeploymentList{}
 	err = r.Client.List(ctx, deployments, &client.ListOptions{Namespace: req.NamespacedName.Namespace})
 
@@ -135,4 +172,41 @@ func (r *ContainerInjectorReconciler) getAll(ctx context.Context, obj client.Obj
 	//// Example: Create a request to reconcile the same object
 	//req := reconcile.Request{NamespacedName: client.ObjectKeyFromObject(obj)}
 	//return []reconcile.Request{req}
+}
+
+func (r *ContainerInjectorReconciler) deleteExternalResources(ctx context.Context, namespace string) error {
+	deployments := &appsv1.DeploymentList{}
+	err := r.Client.List(ctx, deployments, &client.ListOptions{Namespace: namespace})
+
+	if err != nil {
+		return err
+	}
+
+	var deploys []appsv1.Deployment
+	//fmt.Println("cr injector:", injector.Spec.Label)
+	for _, v := range deployments.Items {
+		//fmt.Println(v.Name)
+		//fmt.Println("obj injector:", v.ObjectMeta.Labels[DesiredSelector])
+		for _, c := range v.Spec.Template.Spec.Containers {
+			if c.Name == DesiredSelector {
+				deploys = append(deploys, v)
+			}
+		}
+	}
+
+	for _, deploy := range deploys {
+		println("Deployments to remove: ")
+		println(deploy.Name)
+
+		newContainers := []corev1.Container{}
+		for _, c := range deploy.Spec.Template.Spec.Containers {
+			if c.Name != DesiredSelector {
+				newContainers = append(newContainers, c)
+			}
+		}
+		deploy.Spec.Template.Spec.Containers = newContainers
+		r.Client.Update(ctx, &deploy, &client.UpdateOptions{})
+	}
+
+	return nil
 }
